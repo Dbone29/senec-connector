@@ -1,0 +1,31 @@
+{
+  "name": {
+    "en": "Senec battery"
+  },
+  "class": "battery",
+  "capabilities": [
+    "measure_battery",
+    "measure_current",
+    "measure_power.battery",
+    "measure_power.grid",
+    "measure_power.house",
+    "measure_power.inverter",
+    "measure_voltage"
+  ],
+  "platforms": [
+    "local"
+  ],
+  "connectivity": [
+    "lan"
+  ],
+  "images": {
+    "small": "{{driverAssetsPath}}/images/small.png",
+    "large": "{{driverAssetsPath}}/images/large.png",
+    "xlarge": "{{driverAssetsPath}}/images/xlarge.png"
+  },
+  "pair": [
+    {
+      "id": "ip"
+    }
+  ]
+}
