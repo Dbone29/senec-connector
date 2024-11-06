@@ -2,12 +2,12 @@
 
 const Homey = require("homey");
 
-class MyDevice extends Homey.Device {
+class SenecDevice extends Homey.Device {
   /**
    * onInit is called when the device is initialized.
    */
   async onInit() {
-    this.log("MyDevice has been initialized");
+    this.log("SenecDevice has been initialized");
 
     this.pollInterval = setInterval(() => {
       this.pollBatteryStatus();
@@ -19,9 +19,11 @@ class MyDevice extends Homey.Device {
     try {
       process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
+      const ipAddress = this.getSetting('ipAddress');
+
       var http = require("http.min");
       var result = await http.post(
-        "https://" + this.getStoreValue("address") + "/lala.cgi",
+        "https://" + ipAddress + "/lala.cgi",
         {
           BMS: {
             SYSTEM_SOC: "",
@@ -65,7 +67,6 @@ class MyDevice extends Homey.Device {
         this.parseFloat("0x" + batPower)
       );
       this.setCapabilityValue("measure_battery", Number("0x" + batCharge) / 10);
-
 
       this.setCapabilityValue(
         "measure_power.inverter",
@@ -120,7 +121,7 @@ class MyDevice extends Homey.Device {
    * onAdded is called when the user adds the device, called just after pairing.
    */
   async onAdded() {
-    this.log("MyDevice has been added");
+    this.log("SenecDevice has been added");
   }
 
   /**
@@ -132,7 +133,7 @@ class MyDevice extends Homey.Device {
    * @returns {Promise<string|void>} return a custom message that will be displayed
    */
   async onSettings({ oldSettings, newSettings, changedKeys }) {
-    this.log("MyDevice settings where changed");
+    this.log("SenecDevice settings where changed");
   }
 
   /**
@@ -141,14 +142,14 @@ class MyDevice extends Homey.Device {
    * @param {string} name The new name
    */
   async onRenamed(name) {
-    this.log("MyDevice was renamed");
+    this.log("SenecDevice was renamed");
   }
 
   /**
    * onDeleted is called when the user deleted the device.
    */
   async onDeleted() {
-    this.log("MyDevice has been deleted");
+    this.log("SenecDevice has been deleted");
 
     // Wenn das Gerät gelöscht wird, stoppe das Intervall
     if (this.pollInterval) {
@@ -157,4 +158,4 @@ class MyDevice extends Homey.Device {
   }
 }
 
-module.exports = MyDevice;
+module.exports = SenecDevice;

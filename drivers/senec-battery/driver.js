@@ -1,42 +1,38 @@
-"use strict";
+'use strict';
 
-const Homey = require("homey");
+const { Driver } = require('homey');
 
-class MyDriver extends Homey.Driver {
-  /**
-   * onInit is called when the driver is initialized.
-   */
-  async onInit() {
-    this.log("MyDriver has been initialized");
-  }
+class SenecDriver extends Driver {
+    onInit() {
+        this.log('SenecDriver initialized');
+    }
 
-  async onPair(session) {
-    session.setHandler("my_event", async function (data) {
-      // data is { 'foo': 'bar' }
-      return "Hello!";
-    });
-  }
+    // onPairListDevices verwendet jetzt Promises statt Callback
+    onPairListDevices(data) {
+        return new Promise((resolve, reject) => {
+            const devices = [
+                {
+                    name: 'Senec Battery',
+                    data: { id: 'static-senec-id' },
+                    settings: { ipAddress: '192.168.4.20' }, // Beispiel-IP-Adresse
+                },
+            ];
 
-  /**
-   * onPairListDevices is called when a user is adding a device
-   * and the 'list_devices' view is called.
-   * This should return an array with the data of devices that are available for pairing.
-   */
-  /*async onPairListDevices() {
+            // Rückgabe des Geräts
+            resolve(devices);
+        });
+    }
 
-    return [
-      // Example device data, note that `store` is optional
-      {
-        name: "Senec Battery",
-        data: {
-          id: "senec-battery-01",
-        },
-        store: {
-          address: "192.168.4.20",
-        },
-      },
-    ];
-  }*/
+    // Dies wird nach dem Auswählen des Geräts ausgeführt
+    onPairDevice(deviceData) {
+        this.log('Device selected:', deviceData);
+
+        // Wir setzen das Gerät für das Pairing
+        this.pairing.setDevice(deviceData);
+
+        // Beende das Pairing und zeige den nächsten Schritt (z. B. Done Button)
+        return this.pairing.done();
+    }
 }
 
-module.exports = MyDriver;
+module.exports = SenecDriver;

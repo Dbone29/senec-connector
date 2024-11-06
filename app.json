@@ -28,6 +28,7 @@
   },
   "drivers": [
     {
+      "id": "senec-battery",
       "name": {
         "en": "Senec battery"
       },
@@ -52,12 +53,34 @@
         "large": "/drivers/senec-battery/assets/images/large.png",
         "xlarge": "/drivers/senec-battery/assets/images/xlarge.png"
       },
-      "pair": [
+      "settings": [
         {
-          "id": "ip"
+          "id": "ipAddress",
+          "type": "text",
+          "label": {
+            "en": "IP Address"
+          },
+          "placeholder": {
+            "en": "Enter the IP address of your Senec Battery"
+          },
+          "required": true,
+          "validator": "regex",
+          "regex": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
         }
       ],
-      "id": "senec-battery"
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_device"
+          }
+        },
+        {
+          "id": "add_device",
+          "template": "add_devices"
+        }
+      ]
     }
   ]
 }
