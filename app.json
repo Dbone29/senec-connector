@@ -18,9 +18,9 @@
   ],
   "permissions": [],
   "images": {
-    "small": "/assets/images/small.png",
-    "large": "/assets/images/large.png",
-    "xlarge": "/assets/images/xlarge.png"
+    "small": "/assets/images/small-battery-ai.png",
+    "large": "/assets/images/large-battery-ai.png",
+    "xlarge": "/assets/images/xlarge-battery-ai.png"
   },
   "author": {
     "name": "Daniel Busenius",
@@ -49,9 +49,9 @@
         "lan"
       ],
       "images": {
-        "small": "/drivers/senec-battery/assets/images/small.png",
-        "large": "/drivers/senec-battery/assets/images/large.png",
-        "xlarge": "/drivers/senec-battery/assets/images/xlarge.png"
+        "small": "/drivers/senec-battery/assets/images/small-battery-ai.png",
+        "large": "/drivers/senec-battery/assets/images/large-battery-ai.png",
+        "xlarge": "/drivers/senec-battery/assets/images/xlarge-battery-ai.png"
       },
       "settings": [
         {
@@ -70,15 +70,7 @@
       ],
       "pair": [
         {
-          "id": "list_devices",
-          "template": "list_devices",
-          "navigation": {
-            "next": "add_device"
-          }
-        },
-        {
-          "id": "add_device",
-          "template": "add_devices"
+          "id": "set_ip_view"
         }
       ]
     }
