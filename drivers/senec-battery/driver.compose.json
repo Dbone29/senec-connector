@@ -4,6 +4,7 @@
   },
   "class": "battery",
   "capabilities": [
+    "onoff",
     "measure_battery",
     "measure_current",
     "measure_power.battery",
@@ -12,6 +13,17 @@
     "measure_power.inverter",
     "measure_voltage"
   ],
+  "capabilitiesOptions": {
+    "onoff": {
+      "title": {
+        "en": "On/Off"
+      },
+      "type": "boolean",
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle"
+    }
+  },
   "platforms": [
     "local"
   ],
