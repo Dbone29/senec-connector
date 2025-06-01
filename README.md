@@ -26,7 +26,12 @@ A Homey app that integrates Senec battery storage systems with your Homey smart 
 ## Installation
 
 ### Development Mode
-Run the app in development mode:
+1. Install npm packages:
+```bash
+npm install
+```
+
+2. Run the app in development mode:
 ```bash
 homey app run
 ```
