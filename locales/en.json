@@ -1,1 +1,52 @@
-{}
+{
+  "capabilities": {
+    "onoff": {
+      "title": "Force Charging",
+      "description": "When enabled, forces the battery to charge from the grid"
+    },
+    "measure_battery": {
+      "title": "Battery Level",
+      "description": "Current battery charge percentage"
+    },
+    "measure_current": {
+      "title": "Battery Current",
+      "description": "Current flow (positive = charging, negative = discharging)"
+    },
+    "measure_voltage": {
+      "title": "Battery Voltage",
+      "description": "Current battery voltage"
+    },
+    "measure_power": {
+      "battery": {
+        "title": "Battery Power",
+        "description": "Power flow to/from battery (positive = charging)"
+      },
+      "grid": {
+        "title": "Grid Power",
+        "description": "Power from/to grid (positive = consuming, negative = feeding)"
+      },
+      "house": {
+        "title": "House Consumption",
+        "description": "Total household power consumption"
+      },
+      "inverter": {
+        "title": "Inverter Power",
+        "description": "Power output from the inverter"
+      }
+    }
+  },
+  "settings": {
+    "ipAddress": {
+      "title": "IP Address",
+      "description": "IP address of your Senec battery system"
+    }
+  },
+  "pair": {
+    "title": "Add Senec Battery",
+    "intro": "Enter the IP address of your Senec battery system",
+    "ip_placeholder": "e.g., 192.168.1.100",
+    "invalid_ip": "Please enter a valid IP address",
+    "checking": "Checking connection...",
+    "success": "Successfully connected to Senec battery"
+  }
+}

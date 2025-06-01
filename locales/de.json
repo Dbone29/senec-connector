@@ -1,0 +1,52 @@
+{
+  "capabilities": {
+    "onoff": {
+      "title": "Zwangsladen",
+      "description": "Wenn aktiviert, wird die Batterie vom Netz geladen"
+    },
+    "measure_battery": {
+      "title": "Batteriestand",
+      "description": "Aktueller Ladezustand der Batterie in Prozent"
+    },
+    "measure_current": {
+      "title": "Batteriestrom",
+      "description": "Stromfluss (positiv = Laden, negativ = Entladen)"
+    },
+    "measure_voltage": {
+      "title": "Batteriespannung",
+      "description": "Aktuelle Batteriespannung"
+    },
+    "measure_power": {
+      "battery": {
+        "title": "Batterieleistung",
+        "description": "Leistungsfluss zur/von der Batterie (positiv = Laden)"
+      },
+      "grid": {
+        "title": "Netzleistung",
+        "description": "Leistung vom/zum Netz (positiv = Bezug, negativ = Einspeisung)"
+      },
+      "house": {
+        "title": "Hausverbrauch",
+        "description": "Gesamter Stromverbrauch des Haushalts"
+      },
+      "inverter": {
+        "title": "Wechselrichterleistung",
+        "description": "Ausgangsleistung des Wechselrichters"
+      }
+    }
+  },
+  "settings": {
+    "ipAddress": {
+      "title": "IP-Adresse",
+      "description": "IP-Adresse Ihres Senec-Batteriesystems"
+    }
+  },
+  "pair": {
+    "title": "Senec-Batterie hinzufügen",
+    "intro": "Geben Sie die IP-Adresse Ihres Senec-Batteriesystems ein",
+    "ip_placeholder": "z.B. 192.168.1.100",
+    "invalid_ip": "Bitte geben Sie eine gültige IP-Adresse ein",
+    "checking": "Verbindung wird überprüft...",
+    "success": "Erfolgreich mit Senec-Batterie verbunden"
+  }
+}

@@ -1,3 +1,9 @@
 {
-  "extends": "athom/homey-app"
+  "extends": "athom",
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
+  "env": {
+    "node": true
+  }
 }

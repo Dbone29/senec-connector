@@ -8,10 +8,12 @@
     "local"
   ],
   "name": {
-    "en": "Senec Connector"
+    "en": "Senec Connector",
+    "de": "Senec Connector"
   },
   "description": {
-    "en": "Adds support for Senec batteries."
+    "en": "Adds support for Senec batteries.",
+    "de": "Fügt Unterstützung für Senec-Batterien hinzu."
   },
   "category": [
     "energy"
@@ -30,7 +32,8 @@
     {
       "id": "senec-battery",
       "name": {
-        "en": "Senec battery"
+        "en": "Senec battery",
+        "de": "Senec-Batterie"
       },
       "class": "battery",
       "capabilities": [
@@ -59,10 +62,12 @@
           "id": "ipAddress",
           "type": "text",
           "label": {
-            "en": "IP Address"
+            "en": "IP Address",
+            "de": "IP-Adresse"
           },
           "placeholder": {
-            "en": "Enter the IP address of your Senec Battery"
+            "en": "Enter the IP address of your Senec Battery",
+            "de": "Geben Sie die IP-Adresse Ihrer Senec-Batterie ein"
           },
           "required": true,
           "validator": "regex",
