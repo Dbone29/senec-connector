@@ -46,6 +46,50 @@
         "measure_power.inverter",
         "measure_voltage"
       ],
+      "capabilitiesOptions": {
+        "onoff": {
+          "title": {
+            "en": "Force Charging",
+            "de": "Zwangsladen"
+          }
+        },
+        "measure_power.battery": {
+          "title": {
+            "en": "Battery Power",
+            "de": "Batterieleistung"
+          }
+        },
+        "measure_power.grid": {
+          "title": {
+            "en": "Grid Power",
+            "de": "Netzleistung"
+          }
+        },
+        "measure_power.house": {
+          "title": {
+            "en": "House Power",
+            "de": "Hausverbrauch"
+          }
+        },
+        "measure_power.inverter": {
+          "title": {
+            "en": "Inverter Power",
+            "de": "Wechselrichterleistung"
+          }
+        },
+        "measure_voltage": {
+          "title": {
+            "en": "Battery Voltage",
+            "de": "Batteriespannung"
+          }
+        },
+        "measure_current": {
+          "title": {
+            "en": "Battery Current",
+            "de": "Batteriestrom"
+          }
+        }
+      },
       "platforms": [
         "local"
       ],
