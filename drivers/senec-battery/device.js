@@ -84,10 +84,6 @@ class SenecDevice extends Homey.Device {
         this.parseFloat(`0x${batCurrent}`),
       );
       const batteryPower = this.parseFloat(`0x${batPower}`);
-      this.setCapabilityValue(
-        'measure_power.battery',
-        batteryPower,
-      );
       // measure_power for Homey Energy: positive = charging, negative = discharging
       this.setCapabilityValue('measure_power', batteryPower);
 
@@ -96,25 +92,16 @@ class SenecDevice extends Homey.Device {
 
       this.setCapabilityValue('measure_battery', Number(`0x${batCharge}`) / 10);
 
-      this.setCapabilityValue(
-        'measure_power.inverter',
-        this.parseFloat(`0x${inverterPower}`),
-      );
-      this.setCapabilityValue(
-        'measure_power.grid',
-        this.parseFloat(`0x${gridPower}`),
-      );
+      // Parse other values for sharing with other devices
+      const inverterPowerValue = this.parseFloat(`0x${inverterPower}`);
+      const gridPowerValue = this.parseFloat(`0x${gridPower}`);
       const housePowerValue = this.parseFloat(`0x${housePower}`);
-      this.setCapabilityValue(
-        'measure_power.house',
-        housePowerValue,
-      );
 
       // Emit data to other devices via the main controller pattern
       this.homey.app.emit('senec-data', {
         batteryPower: batteryPower,
-        inverterPower: this.parseFloat(`0x${inverterPower}`),
-        gridPower: this.parseFloat(`0x${gridPower}`),
+        inverterPower: inverterPowerValue,
+        gridPower: gridPowerValue,
         housePower: housePowerValue
       });
 
@@ -126,10 +113,6 @@ class SenecDevice extends Homey.Device {
       this.setCapabilityValue('measure_voltage', 0).catch(this.error);
       this.setCapabilityValue('measure_current', 0).catch(this.error);
       this.setCapabilityValue('measure_power', 0).catch(this.error);
-      this.setCapabilityValue('measure_power.battery', 0).catch(this.error);
-      this.setCapabilityValue('measure_power.inverter', 0).catch(this.error);
-      this.setCapabilityValue('measure_power.grid', 0).catch(this.error);
-      this.setCapabilityValue('measure_power.house', 0).catch(this.error);
     }
   }
 
