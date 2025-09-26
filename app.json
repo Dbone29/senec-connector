@@ -75,10 +75,17 @@
             "en": "Discharged Energy",
             "de": "Entladene Energie"
           }
+        },
+        "measure_power": {
+          "title": {
+            "en": "Battery Power",
+            "de": "Batterieleistung"
+          }
         }
       },
       "energy": {
         "homeBattery": true,
+        "powerCapability": "measure_power",
         "meterPowerImportedCapability": "meter_power.charged",
         "meterPowerExportedCapability": "meter_power.discharged"
       },

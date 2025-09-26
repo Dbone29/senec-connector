@@ -11,6 +11,20 @@ class SenecDevice extends Homey.Device {
   async onInit() {
     this.log('SenecDevice has been initialized');
 
+    // Add missing capabilities for Energy Tab integration
+    if (!this.hasCapability('measure_power')) {
+      await this.addCapability('measure_power');
+      this.log('Added measure_power capability');
+    }
+    if (!this.hasCapability('meter_power.charged')) {
+      await this.addCapability('meter_power.charged');
+      this.log('Added meter_power.charged capability');
+    }
+    if (!this.hasCapability('meter_power.discharged')) {
+      await this.addCapability('meter_power.discharged');
+      this.log('Added meter_power.discharged capability');
+    }
+
     // Initialize cumulative energy meters
     this.chargedEnergy = this.getCapabilityValue('meter_power.charged') || 0;
     this.dischargedEnergy = this.getCapabilityValue('meter_power.discharged') || 0;
@@ -84,7 +98,11 @@ class SenecDevice extends Homey.Device {
         this.parseFloat(`0x${batCurrent}`),
       );
       const batteryPower = this.parseFloat(`0x${batPower}`);
-      // measure_power for Homey Energy: positive = charging, negative = discharging
+      // SENEC API: negative = discharging, positive = charging
+      // Energy Tab needs: positive = charging, negative = discharging
+      // SENEC values are already correct for Energy Tab!
+
+      this.log(`Battery Power: ${batteryPower}W (${batteryPower > 0 ? 'charging' : 'discharging'})`);
       this.setCapabilityValue('measure_power', batteryPower);
 
       // Update cumulative energy meters
@@ -99,7 +117,7 @@ class SenecDevice extends Homey.Device {
 
       // Emit data to other devices via the main controller pattern
       this.homey.app.emit('senec-data', {
-        batteryPower: batteryPower,
+        batteryPower: batteryPower, // Already inverted for Energy Tab
         inverterPower: inverterPowerValue,
         gridPower: gridPowerValue,
         housePower: housePowerValue
