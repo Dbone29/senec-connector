@@ -1,0 +1,52 @@
+{
+  "name": {
+    "en": "Senec Solar/Inverter",
+    "de": "Senec Solar/Wechselrichter"
+  },
+  "class": "solarpanel",
+  "capabilities": [
+    "measure_power",
+    "meter_power"
+  ],
+  "capabilitiesOptions": {
+    "measure_power": {
+      "title": {
+        "en": "Solar Power",
+        "de": "Solarleistung"
+      }
+    },
+    "meter_power": {
+      "title": {
+        "en": "Solar Energy Generated",
+        "de": "Erzeugte Solarenergie"
+      }
+    }
+  },
+  "energy": {
+    "meterPowerExportedCapability": "meter_power"
+  },
+  "platforms": [
+    "local"
+  ],
+  "connectivity": [
+    "lan"
+  ],
+  "images": {
+    "small": "{{driverAssetsPath}}/images/small.png",
+    "large": "{{driverAssetsPath}}/images/large.png",
+    "xlarge": "{{driverAssetsPath}}/images/xlarge.png"
+  },
+  "pair": [
+    {
+      "id": "list_devices",
+      "template": "list_devices",
+      "navigation": {
+        "next": "add_devices"
+      }
+    },
+    {
+      "id": "add_devices",
+      "template": "add_devices"
+    }
+  ]
+}

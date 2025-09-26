@@ -104,10 +104,19 @@ class SenecDevice extends Homey.Device {
         'measure_power.grid',
         this.parseFloat(`0x${gridPower}`),
       );
+      const housePowerValue = this.parseFloat(`0x${housePower}`);
       this.setCapabilityValue(
         'measure_power.house',
-        this.parseFloat(`0x${housePower}`),
+        housePowerValue,
       );
+
+      // Emit data to other devices via the main controller pattern
+      this.homey.app.emit('senec-data', {
+        batteryPower: batteryPower,
+        inverterPower: this.parseFloat(`0x${inverterPower}`),
+        gridPower: this.parseFloat(`0x${gridPower}`),
+        housePower: housePowerValue
+      });
 
       process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
     } catch (error) {

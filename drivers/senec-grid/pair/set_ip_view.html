@@ -1,0 +1,53 @@
+<script type="application/javascript">
+  Homey.on("save_device", async function (data) {
+    let device = {
+      name: "Senec Battery",
+      data: {
+        id: "senec-" + data.mac,
+      },
+      settings: {
+        ipAddress: data.ip,
+      },
+    };
+
+    console.log(device);
+
+    await Homey.createDevice(device)
+      .then(function (result) {
+        Homey.done();
+      })
+      .catch(function (error) {
+        Homey.alert(error);
+      });
+  });
+
+  function onSubmit(event) {
+    const ipAddress = document.getElementById("ip-address").value;
+
+    if (ipAddress.trim() !== "") {
+      // Emit event with IP address
+      Homey.emit("check_ip_event", { ip: ipAddress })
+        .then(function (result) {
+          console.log("Result:", result); // Log the result from the backend
+        })
+        .catch(function (error) {
+          console.error("Error:", error); // Handle any errors
+        });
+    } else {
+      console.error("Please enter a valid IP address.");
+    }
+  }
+
+</script>
+
+<div>
+  <div>
+    <label for="ip-address">
+      IP Address
+    </label>
+    <input id="ip-address" type="text" placeholder="Enter IP address">
+  </div>
+  <button class="homey-button-primary visible" onclick="onSubmit()">
+    <span>Check and save</span>
+  </button>
+</div>

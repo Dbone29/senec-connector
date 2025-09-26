@@ -40,11 +40,14 @@
         "onoff",
         "measure_battery",
         "measure_current",
+        "measure_power",
         "measure_power.battery",
         "measure_power.grid",
         "measure_power.house",
         "measure_power.inverter",
-        "measure_voltage"
+        "measure_voltage",
+        "meter_power.charged",
+        "meter_power.discharged"
       ],
       "capabilitiesOptions": {
         "onoff": {
@@ -88,7 +91,24 @@
             "en": "Battery Current",
             "de": "Batteriestrom"
           }
+        },
+        "meter_power.charged": {
+          "title": {
+            "en": "Charged Energy",
+            "de": "Geladene Energie"
+          }
+        },
+        "meter_power.discharged": {
+          "title": {
+            "en": "Discharged Energy",
+            "de": "Entladene Energie"
+          }
         }
+      },
+      "energy": {
+        "homeBattery": true,
+        "meterPowerImportedCapability": "meter_power.charged",
+        "meterPowerExportedCapability": "meter_power.discharged"
       },
       "platforms": [
         "local"
@@ -121,6 +141,175 @@
       "pair": [
         {
           "id": "set_ip_view"
+        }
+      ]
+    },
+    {
+      "id": "senec-solar",
+      "name": {
+        "en": "Senec Solar/Inverter",
+        "de": "Senec Solar/Wechselrichter"
+      },
+      "class": "solarpanel",
+      "capabilities": [
+        "measure_power",
+        "meter_power"
+      ],
+      "capabilitiesOptions": {
+        "measure_power": {
+          "title": {
+            "en": "Solar Power",
+            "de": "Solarleistung"
+          }
+        },
+        "meter_power": {
+          "title": {
+            "en": "Solar Energy Generated",
+            "de": "Erzeugte Solarenergie"
+          }
+        }
+      },
+      "energy": {
+        "meterPowerExportedCapability": "meter_power"
+      },
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "lan"
+      ],
+      "images": {
+        "small": "/drivers/senec-solar/assets/images/small.png",
+        "large": "/drivers/senec-solar/assets/images/large.png",
+        "xlarge": "/drivers/senec-solar/assets/images/xlarge.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ]
+    },
+    {
+      "id": "senec-consumption",
+      "name": {
+        "en": "Senec Home Consumption",
+        "de": "Senec Hausverbrauch"
+      },
+      "class": "sensor",
+      "capabilities": [
+        "measure_power",
+        "meter_power"
+      ],
+      "capabilitiesOptions": {
+        "measure_power": {
+          "title": {
+            "en": "Home Consumption",
+            "de": "Hausverbrauch"
+          }
+        },
+        "meter_power": {
+          "title": {
+            "en": "Total Home Consumption",
+            "de": "Gesamter Hausverbrauch"
+          }
+        }
+      },
+      "energy": {
+        "cumulative": true,
+        "cumulativeImportedCapability": "meter_power"
+      },
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "lan"
+      ],
+      "images": {
+        "small": "/drivers/senec-consumption/assets/images/small.png",
+        "large": "/drivers/senec-consumption/assets/images/large.png",
+        "xlarge": "/drivers/senec-consumption/assets/images/xlarge.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ]
+    },
+    {
+      "id": "senec-grid",
+      "name": {
+        "en": "Senec Grid Connection",
+        "de": "Senec Netzanschluss"
+      },
+      "class": "sensor",
+      "capabilities": [
+        "measure_power",
+        "meter_power.imported",
+        "meter_power.exported"
+      ],
+      "capabilitiesOptions": {
+        "measure_power": {
+          "title": {
+            "en": "Grid Power",
+            "de": "Netzleistung"
+          }
+        },
+        "meter_power.imported": {
+          "title": {
+            "en": "Grid Energy Imported",
+            "de": "Bezogene Netzenergie"
+          }
+        },
+        "meter_power.exported": {
+          "title": {
+            "en": "Grid Energy Exported",
+            "de": "Eingespeiste Netzenergie"
+          }
+        }
+      },
+      "energy": {
+        "cumulative": true,
+        "cumulativeImportedCapability": "meter_power.imported",
+        "cumulativeExportedCapability": "meter_power.exported"
+      },
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "lan"
+      ],
+      "images": {
+        "small": "/drivers/senec-grid/assets/images/small.png",
+        "large": "/drivers/senec-grid/assets/images/large.png",
+        "xlarge": "/drivers/senec-grid/assets/images/xlarge.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
         }
       ]
     }
