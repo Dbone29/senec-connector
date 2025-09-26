@@ -7,11 +7,14 @@
     "onoff",
     "measure_battery",
     "measure_current",
+    "measure_power",
     "measure_power.battery",
     "measure_power.grid",
     "measure_power.house",
     "measure_power.inverter",
-    "measure_voltage"
+    "measure_voltage",
+    "meter_power.charged",
+    "meter_power.discharged"
   ],
   "capabilitiesOptions": {
     "onoff": {
@@ -22,7 +25,24 @@
       "getable": true,
       "setable": true,
       "uiComponent": "toggle"
+    },
+    "meter_power.charged": {
+      "title": {
+        "en": "Charged Energy",
+        "de": "Geladene Energie"
+      }
+    },
+    "meter_power.discharged": {
+      "title": {
+        "en": "Discharged Energy",
+        "de": "Entladene Energie"
+      }
     }
+  },
+  "energy": {
+    "homeBattery": true,
+    "meterPowerImportedCapability": "meter_power.charged",
+    "meterPowerExportedCapability": "meter_power.discharged"
   },
   "platforms": [
     "local"

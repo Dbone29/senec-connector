@@ -11,6 +11,11 @@ class SenecDevice extends Homey.Device {
   async onInit() {
     this.log('SenecDevice has been initialized');
 
+    // Initialize cumulative energy meters
+    this.chargedEnergy = this.getCapabilityValue('meter_power.charged') || 0;
+    this.dischargedEnergy = this.getCapabilityValue('meter_power.discharged') || 0;
+    this.lastPowerUpdate = Date.now();
+
     this.registerCapabilityListener('onoff', async (value) => {
       if (value) {
         this.forceCharge();
@@ -78,10 +83,17 @@ class SenecDevice extends Homey.Device {
         'measure_current',
         this.parseFloat(`0x${batCurrent}`),
       );
+      const batteryPower = this.parseFloat(`0x${batPower}`);
       this.setCapabilityValue(
         'measure_power.battery',
-        this.parseFloat(`0x${batPower}`),
+        batteryPower,
       );
+      // measure_power for Homey Energy: positive = charging, negative = discharging
+      this.setCapabilityValue('measure_power', batteryPower);
+
+      // Update cumulative energy meters
+      this.updateEnergyMeters(batteryPower);
+
       this.setCapabilityValue('measure_battery', Number(`0x${batCharge}`) / 10);
 
       this.setCapabilityValue(
@@ -104,10 +116,30 @@ class SenecDevice extends Homey.Device {
       this.setCapabilityValue('measure_battery', null).catch(this.error);
       this.setCapabilityValue('measure_voltage', 0).catch(this.error);
       this.setCapabilityValue('measure_current', 0).catch(this.error);
+      this.setCapabilityValue('measure_power', 0).catch(this.error);
       this.setCapabilityValue('measure_power.battery', 0).catch(this.error);
       this.setCapabilityValue('measure_power.inverter', 0).catch(this.error);
       this.setCapabilityValue('measure_power.grid', 0).catch(this.error);
       this.setCapabilityValue('measure_power.house', 0).catch(this.error);
+    }
+  }
+
+  updateEnergyMeters(batteryPower) {
+    const now = Date.now();
+    const timeDiffSeconds = (now - this.lastPowerUpdate) / 1000;
+    this.lastPowerUpdate = now;
+
+    // Calculate energy in kWh (Power in W * time in hours)
+    const energyKwh = Math.abs(batteryPower) * (timeDiffSeconds / 3600) / 1000;
+
+    if (batteryPower > 0) {
+      // Charging - add to charged energy
+      this.chargedEnergy += energyKwh;
+      this.setCapabilityValue('meter_power.charged', this.chargedEnergy).catch(this.error);
+    } else if (batteryPower < 0) {
+      // Discharging - add to discharged energy
+      this.dischargedEnergy += energyKwh;
+      this.setCapabilityValue('meter_power.discharged', this.dischargedEnergy).catch(this.error);
     }
   }
 
