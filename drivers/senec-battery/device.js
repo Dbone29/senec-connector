@@ -90,10 +90,11 @@ class SenecDevice extends Homey.Device {
     if (typeof rawValue !== 'string') {
       throw new Error(`Expected string for ${fieldName}, got ${typeof rawValue}`);
     }
-    if (!rawValue.startsWith('fl_')) {
-      throw new Error(`Expected 'fl_' prefix for ${fieldName}, got: ${rawValue.substring(0, 10)}`);
+    const underscoreIndex = rawValue.indexOf('_');
+    if (underscoreIndex === -1) {
+      throw new Error(`Expected prefixed value for ${fieldName}, got: ${rawValue.substring(0, 10)}`);
     }
-    return rawValue.substring(3);
+    return rawValue.substring(underscoreIndex + 1);
   }
 
   // Poll battery status from SENEC API
