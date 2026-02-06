@@ -2,7 +2,6 @@
 
 const Homey = require('homey');
 const https = require('https');
-const http = require('http.min');
 
 class SenecDevice extends Homey.Device {
 
@@ -49,12 +48,31 @@ class SenecDevice extends Homey.Device {
     this._schedulePoll();
   }
 
-  _getRequestOptions() {
-    const ipAddress = this.getSetting('ipAddress');
-    return {
-      uri: `https://${ipAddress}/lala.cgi`,
-      agent: this.httpsAgent,
-    };
+  _post(data) {
+    return new Promise((resolve, reject) => {
+      const ipAddress = this.getSetting('ipAddress');
+      const postData = JSON.stringify(data);
+      const options = {
+        hostname: ipAddress,
+        path: '/lala.cgi',
+        method: 'POST',
+        agent: this.httpsAgent,
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData),
+        },
+      };
+      const req = https.request(options, (res) => {
+        let body = '';
+        res.on('data', (chunk) => {
+          body += chunk;
+        });
+        res.on('end', () => resolve({ data: body }));
+      });
+      req.on('error', reject);
+      req.write(postData);
+      req.end();
+    });
   }
 
   _schedulePoll() {
@@ -81,7 +99,7 @@ class SenecDevice extends Homey.Device {
   // Poll battery status from SENEC API
   async pollBatteryStatus() {
     try {
-      const result = await http.post(this._getRequestOptions(), {
+      const result = await this._post({
         BMS: {
           SYSTEM_SOC: '',
         },
@@ -215,7 +233,7 @@ class SenecDevice extends Homey.Device {
 
   async forceCharge() {
     try {
-      await http.post(this._getRequestOptions(), {
+      await this._post({
         ENERGY: {
           SAFE_CHARGE_FORCE: 'u8_01',
         },
@@ -229,7 +247,7 @@ class SenecDevice extends Homey.Device {
 
   async allowDischarge() {
     try {
-      await http.post(this._getRequestOptions(), {
+      await this._post({
         ENERGY: {
           SAFE_CHARGE_PROHIBIT: 'u8_01',
         },

@@ -5,13 +5,13 @@
   "scripts": {
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore ."
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
     "@types/homey": "npm:homey-apps-sdk-v3-types@^0.3.12",
     "eslint": "^8.56.0",
     "eslint-config-athom": "^3.1.5"
   },
-  "license": "MIT",
-  "dependencies": {
-    "http.min": "^2.1.0"
-  }
+  "license": "MIT"
 }
