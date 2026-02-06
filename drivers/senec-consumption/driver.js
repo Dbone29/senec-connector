@@ -13,9 +13,9 @@ class SenecConsumptionDriver extends Homey.Driver {
       {
         name: 'SENEC Home Consumption',
         data: {
-          id: 'senec-consumption-main'
-        }
-      }
+          id: 'senec-consumption-main',
+        },
+      },
     ];
   }
 

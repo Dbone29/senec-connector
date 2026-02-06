@@ -12,9 +12,8 @@ class SenecSolarDevice extends Homey.Device {
     this.lastPowerUpdate = Date.now();
 
     // Listen for data updates from main battery device
-    this.homey.app.on('senec-data', (data) => {
-      this.updateSolarData(data);
-    });
+    this._onSenecData = (data) => this.updateSolarData(data);
+    this.homey.app.on('senec-data', this._onSenecData);
   }
 
   updateSolarData(data) {
@@ -35,10 +34,10 @@ class SenecSolarDevice extends Homey.Device {
     this.lastPowerUpdate = now;
 
     // Calculate energy in kWh (Power in W * time in hours)
-    const energyKwh = solarPower * (timeDiffSeconds / 3600) / 1000;
+    const energyKwh = (solarPower * timeDiffSeconds) / 3600 / 1000;
 
     // Add to total generated energy (must only increase)
-    this.totalSolarGenerated += energyKwh;
+    this.totalSolarGenerated = Math.round((this.totalSolarGenerated + energyKwh) * 10000) / 10000;
     this.setCapabilityValue('meter_power', this.totalSolarGenerated).catch(this.error);
   }
 
@@ -56,6 +55,10 @@ class SenecSolarDevice extends Homey.Device {
 
   async onDeleted() {
     this.log('SenecSolarDevice has been deleted');
+
+    if (this._onSenecData) {
+      this.homey.app.removeListener('senec-data', this._onSenecData);
+    }
   }
 
 }

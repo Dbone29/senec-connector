@@ -13,9 +13,9 @@ class SenecGridDriver extends Homey.Driver {
       {
         name: 'SENEC Grid Connection',
         data: {
-          id: 'senec-grid-main'
-        }
-      }
+          id: 'senec-grid-main',
+        },
+      },
     ];
   }
 

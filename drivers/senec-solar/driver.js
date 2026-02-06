@@ -13,9 +13,9 @@ class SenecSolarDriver extends Homey.Driver {
       {
         name: 'SENEC Solar/Inverter',
         data: {
-          id: 'senec-solar-main'
-        }
-      }
+          id: 'senec-solar-main',
+        },
+      },
     ];
   }
 

@@ -13,15 +13,14 @@ class SenecGridDevice extends Homey.Device {
     this.lastPowerUpdate = Date.now();
 
     // Listen for data updates from main battery device
-    this.homey.app.on('senec-data', (data) => {
-      this.updateGridData(data);
-    });
+    this._onSenecData = (data) => this.updateGridData(data);
+    this.homey.app.on('senec-data', this._onSenecData);
   }
 
   updateGridData(data) {
     if (data.gridPower === undefined) return;
 
-    const gridPower = data.gridPower;
+    const { gridPower } = data;
 
     // Update current power (positive = import, negative = export)
     this.setCapabilityValue('measure_power', gridPower).catch(this.error);
@@ -36,15 +35,15 @@ class SenecGridDevice extends Homey.Device {
     this.lastPowerUpdate = now;
 
     // Calculate energy in kWh (Power in W * time in hours)
-    const energyKwh = Math.abs(gridPower) * (timeDiffSeconds / 3600) / 1000;
+    const energyKwh = (Math.abs(gridPower) * timeDiffSeconds) / 3600 / 1000;
 
     if (gridPower > 0) {
       // Importing from grid
-      this.totalImported += energyKwh;
+      this.totalImported = Math.round((this.totalImported + energyKwh) * 10000) / 10000;
       this.setCapabilityValue('meter_power.imported', this.totalImported).catch(this.error);
     } else if (gridPower < 0) {
       // Exporting to grid
-      this.totalExported += energyKwh;
+      this.totalExported = Math.round((this.totalExported + energyKwh) * 10000) / 10000;
       this.setCapabilityValue('meter_power.exported', this.totalExported).catch(this.error);
     }
   }
@@ -63,6 +62,10 @@ class SenecGridDevice extends Homey.Device {
 
   async onDeleted() {
     this.log('SenecGridDevice has been deleted');
+
+    if (this._onSenecData) {
+      this.homey.app.removeListener('senec-data', this._onSenecData);
+    }
   }
 
 }

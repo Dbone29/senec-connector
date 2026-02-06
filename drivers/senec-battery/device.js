@@ -1,6 +1,7 @@
 'use strict';
 
 const Homey = require('homey');
+const https = require('https');
 const http = require('http.min');
 
 class SenecDevice extends Homey.Device {
@@ -10,6 +11,9 @@ class SenecDevice extends Homey.Device {
    */
   async onInit() {
     this.log('SenecDevice has been initialized');
+
+    // HTTPS agent that accepts self-signed certificates (per-request, not global)
+    this.httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
     // Add missing capabilities for Energy Tab integration
     if (!this.hasCapability('measure_power')) {
@@ -38,19 +42,46 @@ class SenecDevice extends Homey.Device {
       }
     });
 
-    this.pollInterval = setInterval(() => {
-      this.pollBatteryStatus();
-    }, 3000);
+    // Polling with exponential backoff
+    this.consecutiveErrors = 0;
+    this.baseInterval = 3000;
+    this.maxInterval = 60000;
+    this._schedulePoll();
   }
 
-  // Methode, um den Batteriestatus abzufragen
+  _getRequestOptions() {
+    const ipAddress = this.getSetting('ipAddress');
+    return {
+      uri: `https://${ipAddress}/lala.cgi`,
+      agent: this.httpsAgent,
+    };
+  }
+
+  _schedulePoll() {
+    const delay = Math.min(
+      this.baseInterval * (2 ** this.consecutiveErrors),
+      this.maxInterval,
+    );
+    this.pollTimeout = setTimeout(async () => {
+      await this.pollBatteryStatus();
+      this._schedulePoll();
+    }, delay);
+  }
+
+  _extractHexValue(rawValue, fieldName) {
+    if (typeof rawValue !== 'string') {
+      throw new Error(`Expected string for ${fieldName}, got ${typeof rawValue}`);
+    }
+    if (!rawValue.startsWith('fl_')) {
+      throw new Error(`Expected 'fl_' prefix for ${fieldName}, got: ${rawValue.substring(0, 10)}`);
+    }
+    return rawValue.substring(3);
+  }
+
+  // Poll battery status from SENEC API
   async pollBatteryStatus() {
     try {
-      process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
-
-      const ipAddress = this.getSetting('ipAddress');
-
-      const result = await http.post(`https://${ipAddress}/lala.cgi`, {
+      const result = await http.post(this._getRequestOptions(), {
         BMS: {
           SYSTEM_SOC: '',
         },
@@ -66,18 +97,16 @@ class SenecDevice extends Homey.Device {
         },
       });
 
-      // this.log("Response: " + result.data);
-
       const jsonData = JSON.parse(result.data);
 
-      const batVolt = jsonData.ENERGY.GUI_BAT_DATA_VOLTAGE.substring(3);
-      const batCurrent = jsonData.ENERGY.GUI_BAT_DATA_CURRENT.substring(3);
-      const batPower = jsonData.ENERGY.GUI_BAT_DATA_POWER.substring(3);
-      const batCharge = jsonData.BMS.SYSTEM_SOC.substring(3);
+      const batVolt = this._extractHexValue(jsonData.ENERGY.GUI_BAT_DATA_VOLTAGE, 'voltage');
+      const batCurrent = this._extractHexValue(jsonData.ENERGY.GUI_BAT_DATA_CURRENT, 'current');
+      const batPower = this._extractHexValue(jsonData.ENERGY.GUI_BAT_DATA_POWER, 'power');
+      const batCharge = this._extractHexValue(jsonData.BMS.SYSTEM_SOC, 'soc');
 
-      const inverterPower = jsonData.ENERGY.GUI_INVERTER_POWER.substring(3);
-      const gridPower = jsonData.ENERGY.GUI_GRID_POW.substring(3);
-      const housePower = jsonData.ENERGY.GUI_HOUSE_POW.substring(3);
+      const inverterPower = this._extractHexValue(jsonData.ENERGY.GUI_INVERTER_POWER, 'inverter');
+      const gridPower = this._extractHexValue(jsonData.ENERGY.GUI_GRID_POW, 'grid');
+      const housePower = this._extractHexValue(jsonData.ENERGY.GUI_HOUSE_POW, 'house');
 
       const isSafeChargeRunning = jsonData.ENERGY.SAFE_CHARGE_RUNNING;
 
@@ -117,20 +146,24 @@ class SenecDevice extends Homey.Device {
 
       // Emit data to other devices via the main controller pattern
       this.homey.app.emit('senec-data', {
-        batteryPower: batteryPower, // Already inverted for Energy Tab
+        batteryPower,
         inverterPower: inverterPowerValue,
         gridPower: gridPowerValue,
-        housePower: housePowerValue
+        housePower: housePowerValue,
       });
 
-      process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
+      // Reset error counter and mark device as available
+      this.consecutiveErrors = 0;
+      if (!this.getAvailable()) {
+        this.setAvailable().catch(this.error);
+      }
     } catch (error) {
+      this.consecutiveErrors++;
       this.error('Error polling battery status:', error);
-      // Set capabilities to null or 0 to indicate error state
-      this.setCapabilityValue('measure_battery', null).catch(this.error);
-      this.setCapabilityValue('measure_voltage', 0).catch(this.error);
-      this.setCapabilityValue('measure_current', 0).catch(this.error);
-      this.setCapabilityValue('measure_power', 0).catch(this.error);
+
+      if (this.consecutiveErrors >= 3) {
+        this.setUnavailable('Connection to Senec battery failed').catch(this.error);
+      }
     }
   }
 
@@ -140,15 +173,15 @@ class SenecDevice extends Homey.Device {
     this.lastPowerUpdate = now;
 
     // Calculate energy in kWh (Power in W * time in hours)
-    const energyKwh = Math.abs(batteryPower) * (timeDiffSeconds / 3600) / 1000;
+    const energyKwh = (Math.abs(batteryPower) * timeDiffSeconds) / 3600 / 1000;
 
     if (batteryPower > 0) {
       // Charging - add to charged energy
-      this.chargedEnergy += energyKwh;
+      this.chargedEnergy = Math.round((this.chargedEnergy + energyKwh) * 10000) / 10000;
       this.setCapabilityValue('meter_power.charged', this.chargedEnergy).catch(this.error);
     } else if (batteryPower < 0) {
       // Discharging - add to discharged energy
-      this.dischargedEnergy += energyKwh;
+      this.dischargedEnergy = Math.round((this.dischargedEnergy + energyKwh) * 10000) / 10000;
       this.setCapabilityValue('meter_power.discharged', this.dischargedEnergy).catch(this.error);
     }
   }
@@ -182,43 +215,29 @@ class SenecDevice extends Homey.Device {
 
   async forceCharge() {
     try {
-      process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
-
-      const ipAddress = this.getSetting('ipAddress');
-
-      await http.post(`https://${ipAddress}/lala.cgi`, {
+      await http.post(this._getRequestOptions(), {
         ENERGY: {
           SAFE_CHARGE_FORCE: 'u8_01',
         },
       });
 
       this.log('Force charge enabled');
-
-      process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
     } catch (error) {
       this.error('Error setting force charge mode:', error);
-      process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
     }
   }
 
   async allowDischarge() {
     try {
-      process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
-
-      const ipAddress = this.getSetting('ipAddress');
-
-      await http.post(`https://${ipAddress}/lala.cgi`, {
+      await http.post(this._getRequestOptions(), {
         ENERGY: {
           SAFE_CHARGE_PROHIBIT: 'u8_01',
         },
       });
 
       this.log('Force charge disabled');
-
-      process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
     } catch (error) {
       this.error('Error disabling force charge mode:', error);
-      process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 1;
     }
   }
 
@@ -256,9 +275,13 @@ class SenecDevice extends Homey.Device {
   async onDeleted() {
     this.log('SenecDevice has been deleted');
 
-    // Wenn das Gerät gelöscht wird, stoppe das Intervall
-    if (this.pollInterval) {
-      clearInterval(this.pollInterval);
+    // Stop polling when device is deleted
+    if (this.pollTimeout) {
+      clearTimeout(this.pollTimeout);
+    }
+
+    if (this.httpsAgent) {
+      this.httpsAgent.destroy();
     }
   }
 
