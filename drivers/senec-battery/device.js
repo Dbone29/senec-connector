@@ -69,6 +69,9 @@ class SenecDevice extends Homey.Device {
         });
         res.on('end', () => resolve({ data: body }));
       });
+      req.setTimeout(10000, () => {
+        req.destroy(new Error('Request timeout'));
+      });
       req.on('error', reject);
       req.write(postData);
       req.end();
@@ -206,30 +209,10 @@ class SenecDevice extends Homey.Device {
   }
 
   parseFloat(str) {
-    let float = 0;
-    let exp;
-    let int = 0;
-    let multi = 1;
-    if (/^0x/.exec(str)) {
-      int = parseInt(str, 16);
-    } else {
-      for (let i = str.length - 1; i >= 0; i -= 1) {
-        if (str.charCodeAt(i) > 255) {
-          this.error('Invalid string parameter for float parsing');
-          return false;
-        }
-        int += str.charCodeAt(i) * multi;
-        multi *= 256;
-      }
-    }
-    const sign = int >>> 31 ? -1 : 1;
-    exp = ((int >>> 23) & 0xff) - 127;
-    const mantissa = ((int & 0x7fffff) + 0x800000).toString(2);
-    for (let i = 0; i < mantissa.length; i += 1) {
-      float += parseInt(mantissa[i], 10) ? (2 ** exp) : 0;
-      exp--;
-    }
-    return float * sign;
+    const int = /^0x/.test(str) ? parseInt(str, 16) : Number(str);
+    const buf = Buffer.alloc(4);
+    buf.writeUInt32BE(int >>> 0);
+    return buf.readFloatBE(0);
   }
 
   async forceCharge() {

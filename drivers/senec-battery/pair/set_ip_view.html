@@ -1,7 +1,7 @@
 <script type="application/javascript">
   Homey.on("save_device", async function (data) {
     let device = {
-      name: "Senec Battery",
+      name: "Senec battery",
       data: {
         id: "senec-" + data.mac,
       },
@@ -9,8 +9,6 @@
         ipAddress: data.ip,
       },
     };
-
-    console.log(device);
 
     await Homey.createDevice(device)
       .then(function (result) {
