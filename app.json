@@ -17,6 +17,7 @@
   "category": [
     "energy"
   ],
+  "brandColor": "#78BE20",
   "permissions": [],
   "images": {
     "small": "/assets/images/small-battery-ai.png",
@@ -201,7 +202,6 @@
         }
       },
       "energy": {
-        "cumulative": true,
         "cumulativeImportedCapability": "meter_power"
       },
       "platforms": [
